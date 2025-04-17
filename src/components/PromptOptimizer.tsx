@@ -39,7 +39,7 @@ const PromptOptimizer: React.FC<PromptOptimizerProps> = ({ inputPrompt: initialI
       setOutputPrompt(optimizedPrompt);
     } catch (err) {
       console.error('优化提示词失败:', err);
-      setError('API请求失败，请检查您的API密钥或网络连接');
+      setError('API请求失败，请检查您的API密钥或网络连接,在设置中添加硅基流动下的API密钥。');
     } finally {
       setIsLoading(false);
     }
