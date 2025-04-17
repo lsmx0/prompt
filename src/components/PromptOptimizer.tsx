@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDownIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ArrowPathIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { optimizePrompt, DEFAULT_MODEL } from '../services/siliconFlowApi';
 
 interface PromptOptimizerProps {
@@ -54,6 +54,12 @@ const PromptOptimizer: React.FC<PromptOptimizerProps> = ({ inputPrompt: initialI
     setIsModeDropdownOpen(false);
   };
 
+  const handleClear = () => {
+    setInputPrompt('');
+    setOutputPrompt('');
+    setError(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
@@ -88,28 +94,49 @@ const PromptOptimizer: React.FC<PromptOptimizerProps> = ({ inputPrompt: initialI
               </div>
             </div>
           </div>
-          <textarea
-            value={inputPrompt}
-            onChange={(e) => setInputPrompt(e.target.value)}
-            placeholder="在这里输入您的提示词..."
-            className="w-full h-64 bg-slate-800 rounded-lg p-4 text-white resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-          <button
-            onClick={handleOptimize}
-            disabled={isLoading || !inputPrompt.trim()}
-            className={`mt-3 w-full py-2 rounded-md font-medium flex items-center justify-center ${
-              isLoading || !inputPrompt.trim() ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700 text-white'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <ArrowPathIcon className="h-5 w-5 mr-2 animate-spin" />
-                优化中...
-              </>
-            ) : (
-              '优化提示词'
+          <div className="relative">
+            <textarea
+              value={inputPrompt}
+              onChange={(e) => setInputPrompt(e.target.value)}
+              placeholder="在这里输入您的提示词..."
+              className="w-full h-64 bg-slate-800 rounded-lg p-4 text-white resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            {inputPrompt && (
+              <button
+                onClick={() => setInputPrompt('')}
+                className="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 p-1 rounded"
+                title="清空输入"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
             )}
-          </button>
+          </div>
+          <div className="flex space-x-2 mt-3">
+            <button
+              onClick={handleOptimize}
+              disabled={isLoading || !inputPrompt.trim()}
+              className={`flex-1 py-2 rounded-md font-medium flex items-center justify-center ${
+                isLoading || !inputPrompt.trim() ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700 text-white'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <ArrowPathIcon className="h-5 w-5 mr-2 animate-spin" />
+                  优化中...
+                </>
+              ) : (
+                '优化提示词'
+              )}
+            </button>
+            <button
+              onClick={handleClear}
+              className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md flex items-center justify-center"
+              title="清空所有内容"
+            >
+              <XMarkIcon className="h-5 w-5 mr-1" />
+              清空
+            </button>
+          </div>
           
           {error && (
             <div className="mt-2 text-red-500 text-sm">
@@ -128,15 +155,24 @@ const PromptOptimizer: React.FC<PromptOptimizerProps> = ({ inputPrompt: initialI
               placeholder="优化后的提示词将显示在这里..."
             />
             {outputPrompt && (
-              <button
-                onClick={copyToClipboard}
-                className="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 p-1 rounded"
-                title="复制到剪贴板"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                </svg>
-              </button>
+              <>
+                <button
+                  onClick={copyToClipboard}
+                  className="absolute top-2 right-10 bg-slate-700 hover:bg-slate-600 p-1 rounded"
+                  title="复制到剪贴板"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setOutputPrompt('')}
+                  className="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 p-1 rounded"
+                  title="清空结果"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </>
             )}
           </div>
           <div className="mt-3 text-sm text-slate-400">
